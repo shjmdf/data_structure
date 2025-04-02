@@ -45,13 +45,13 @@ void CreateHC(HuffmanTree HT,HuffmanCode &HC,int n){
         while(f!=0){
             --start;
             if(HT[f].lchild==c)cd[start]='0';
-            else cd[start]=='1';
+            else cd[start]='1';
             c=f;
             f=HT[f].parent;
         }
         HC[i]=new char[n-start];
         strcpy(HC[i],&cd[start]);
     }
-    delete cd;
+    delete[] cd;
 }
 //fucking tortuous, why can't it be easier to use ptr?
