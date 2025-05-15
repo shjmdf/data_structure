@@ -92,6 +92,7 @@ public:
                     node->parent->left=nullptr;
                 else node->parent->right=nullptr;
             }
+            delete node;
         }
         //左无右有
         if(node->left==nullptr){
