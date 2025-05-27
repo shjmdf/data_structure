@@ -1,0 +1,244 @@
+\documentclass{ctexart}
+\usepackage{amsmath} % 用于数学公式
+\usepackage{amsfonts} % 用于数学字体
+\usepackage{amssymb} % 用于数学符号
+\usepackage{graphicx} % 用于插入图片 (如果需要)
+\usepackage{array} % 用于更复杂的表格
+\usepackage{xcolor} % 用于颜色支持 (listings 需要)
+\usepackage{listings} % 用于代码块
+\usepackage{geometry} % 用于页面边距设置
+\usepackage{hyperref} % 用于超链接 (如果需要)
+\usepackage{enumitem} % 用于自定义列表
+\usepackage{booktabs} % 用于高质量表格线
+
+\geometry{a4paper, margin=1in}
+
+\title{Chapter 06}
+\author{谢胡睿 2400014151 数算（B）24-25春}
+\date{\today}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!50!black},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray}
+}
+
+\begin{document}
+\maketitle
+\begin{center}
+\section*{Chapter 06}
+\textbf{谢胡睿 2400014151 数算（B）24-25春}
+\end{center}
+
+作业(p199\textasciitilde200):
+\begin{itemize}
+    \item 复习题:2、3、4、5
+    \item 算法题:3、5
+\end{itemize}
+
+作业(p248\textasciitilde249):
+\begin{itemize}
+    \item 复习题:1、2、3、7
+    \item 算法题:1
+\end{itemize}
+
+\section*{复习题2.}
+$Ans:$ 总共需要3次，过程如下：\\
+首先，字典总共16个元素，且已经有序。\\
+使用二分法则先从中间开始，
+\begin{enumerate}
+    \item $l=0, r=15, mid=7$ \\
+    $D[7]=509 < 612$, 则 $l=7+1=8$
+    \item $l=8, r=15, mid=11$ \\
+    $D[11]=677 > 612$, 则 $r=11-1=10$
+    \item $l=8, r=10, mid=9$ \\
+    $D[9]=612 == 612, finish!$
+\end{enumerate}
+
+\section*{复习题3.}
+因为 $\alpha=0.5$, 则 $p=16/0.5=32$，做取余哈希
+\[ H(key) = key \pmod{32} \]
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+元素 & $key \pmod{32}$ & 地址 & 是否碰撞? \\ \midrule
+16   & $16 \pmod{32}=16$   & 16   & No        \\ % 16 mod 32 is 16, not 32
+87   & $87 \pmod{32} = 23$  & 23   & No        \\
+154  & $154 \pmod{32} = 26$ & 26   & No        \\
+170  & $170 \pmod{32} = 10$ & 10   & No        \\
+275  & $275 \pmod{32} = 19$ & 19   & No        \\
+426  & $426 \pmod{32} = 10$ & 10   & Yes (170) \\
+503  & $503 \pmod{32} = 23$ & 23   & Yes (087) \\
+509  & $509 \pmod{32} = 29$ & 29   & No        \\
+512  & $512 \pmod{32} = 0$  & 0    & No        \\
+612  & $612 \pmod{32} = 4$  & 4    & No        \\
+653  & $653 \pmod{32} = 13$ & 13   & No        \\
+677  & $677 \pmod{32} = 5$  & 5    & No        \\
+703  & $703 \pmod{32} = 31$ & 31   & No        \\
+765  & $765 \pmod{32} = 29$ & 29   & Yes (509) \\
+897  & $897 \pmod{32} = 1$  & 1    & No        \\
+908  & $908 \pmod{32} = 12$ & 12   & No        \\ \bottomrule
+\end{tabular}
+\caption{哈希表构造过程}
+\end{table}
+碰撞3次。
+
+\section*{复习题4.}
+用开地址线性探查法：\\
+$426: T[11]=426, T[10]=170$ \\
+$503: T[24]=503, T[23]=87$ \\
+$765: T[30]=765, T[29]=509$ \\
+存储状况如下：\\
+$T[0] = 512$ \\
+$T[1] = 897$ \\
+$T[4] = 612$ \\
+$T[5] = 677$ \\
+$T[10] = 170$ \\
+$T[11] = 426$ \\
+$T[12] = 908$ \\
+$T[13] = 653$ \\
+$T[16] = 016$ \\
+$T[19] = 275$ \\
+$T[23] = 087$ \\
+$T[24] = 503$ \\
+$T[26] = 154$ \\
+$T[29] = 509$ \\
+$T[30] = 765$ \\
+$T[31] = 703$ \\
+其余均为空
+
+\section*{复习题5.}
+顺序，二分易于理解，实现简单（二分需要排序 $O(n\log n)$，且是离线的，不能在线处理）\\
+哈希法需要找到一个比较好的函数，坏的函数时间复杂度将趋近于 $O(n)$ \\
+哈希法要消耗额外的空间 \\
+故三种方法各有利弊，需按需完成。
+
+\section*{算法题3.}
+顺序存储结构：
+\begin{lstlisting}
+typedef struct{
+    int key;
+    int info;
+} Node;
+#define MAX 1000
+typedef struct{
+    Node e[MAX];
+    int n;
+} Seq;
+
+int func(int key, Seq *seq){
+    for(int i=0; i < seq->n; i++){
+        if(seq->e[i].key == key){
+            if(i){ // 如果不是第一个元素
+                Node temp;
+                temp = seq->e[i-1];
+                seq->e[i-1] = seq->e[i];
+                seq->e[i] = temp;
+                return seq->e[i-1].info; // 返回移动到前一个位置的元素的info
+            }
+            else { // 如果是第一个元素，无法前移
+                return seq->e[i].info;
+            }
+        }
+    }
+    return -1; // 未找到
+}
+\end{lstlisting}
+
+链式存储：
+\begin{lstlisting}
+typedef struct LNode { // 结构体名称 LNode
+    int data;
+    struct LNode *next;
+} LNode, *LList; // LNode是类型名, LList是指向LNode的指针类型
+
+bool func(LList *lst, int key){ // lst 是指向头指针的指针
+    if(*lst == NULL) return false;
+    LNode *prepre = NULL; // 指向pre的前一个节点
+    LNode *pre = NULL;    // 指向crr的前一个节点
+    LNode *crr = *lst;    // 当前节点，从头节点开始
+
+    while(crr != NULL){
+        if(crr->data == key){
+            if(pre != NULL){ // 如果找到的节点不是头节点
+                // 将crr节点移动到pre节点之前
+                pre->next = crr->next; // pre的下一个指向crr的下一个，断开pre和crr
+                
+                if(prepre != NULL){ // 如果pre不是头节点
+                    prepre->next = crr; // prepre的下一个指向crr
+                }
+                else{ // 如果pre是头节点, crr将成为新的头节点
+                    *lst = crr;
+                }
+                crr->next = pre; // crr的下一个指向pre
+                return true;
+            }
+            // 如果找到的节点就是头节点，它已经是第一个了，无需移动
+            return true; 
+        }
+        prepre = pre;
+        pre = crr;
+        crr = crr->next;
+    }
+    return false; // 未找到key
+}
+\end{lstlisting}
+
+\section*{算法题5.}
+\begin{lstlisting}
+enum SlotStatus { EMPTY, OCCUPIED, DELETED };
+
+struct HT {
+    int key;
+    SlotStatus status;
+};
+
+#define MAX_TABLE_SIZE 1000 // 假设哈希表最大大小
+HT table[MAX_TABLE_SIZE]; // 声明哈希表数组
+
+// 假设 h1 和 h2 是已定义的哈希函数
+// 假设 m 是哈希表的大小 (模数)
+// init every entry as EMPTY (需要在某个初始化函数中完成)
+
+bool Delete(int key_to_delete) {
+    int i = 0;
+    int initial_hash_val;
+    int step_hash_val;
+    int current_address;
+    int m = MAX_TABLE_SIZE; // 假设 m 是表的大小
+
+    // initial_hash_val = h1(key_to_delete) % m; // 假设h1已定义
+    // step_hash_val = h2(key_to_delete) % m;    // 假设h2已定义
+    // 为了编译，这里用简单的示例代替
+    initial_hash_val = key_to_delete % m; 
+    step_hash_val = 1 + (key_to_delete % (m-1)); // 确保与m互素且不为0
+
+    if (step_hash_val == 0) { // 确保步长不为0 (虽然上面的h2示例已处理)
+        step_hash_val = 1;
+    }
+
+    do {
+        current_address = (initial_hash_val + i * step_hash_val) % m;
+        if (table[current_address].status == OCCUPIED && table[current_address].key == key_to_delete) {
+            table[current_address].status = DELETED;
+            return true;
+        }
+        if (table[current_address].status == EMPTY) { // 如果遇到空槽，说明元素不存在
+            return false;
+        }
+        i++;
+    } while (i < m); // 避免无限循环，最多探测m次
+
+    return false; // 探测完整个表也未找到
+}
+\end{lstlisting}
+
+\end{document}
